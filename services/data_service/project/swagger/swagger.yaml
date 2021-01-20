@@ -11,60 +11,55 @@ info:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
 tags:
-- name: "data-service"
-  description: "Everything about your data-service"
-  externalDocs:
-    description: "Find out more"
-    url: "http://swagger.io"
-- name: "store"
-  description: "Example endpoint  list of data-service"
-- name: "user"
-  description: "Operations about user"
-  externalDocs:
-    description: "Find out more about our store"
-    url: "http://swagger.io"
+  - name: "Countries"
+    description: "Everything about COVID in a country"
 schemes:
-- "http"
+  - "http"
 paths:
-  /:
+  /country:
     get:
       tags:
-      - "Dummy View"
-      summary: "Example endpoint return a message"
-      description: ""
-      operationId: "get"
-      consumes:
-      - "application/json"
+        - "Countries"
+      summary: "Get stats by country id"
       produces:
-      - "application/json"
+        - "application/json"
+      parameters:
+        - name: iso_code
+          in: query
+          required: true
+          type: string
+          description: ISO code of the country
+        - name: from_date
+          in: query
+          required: true
+          type: string
+          description: Start date
+        - name: to_date
+          in: query
+          required: true
+          type: string
+          description: End date
       responses:
         "200":
-          description: "A detail view with a message"
+          description: "Active cases and vaccination details"
           schema:
-            $ref: '#/definitions/dummy_msg'
-      x-swagger-router-controller: "project.views.views"
-    post:
-      tags:
-      - "Dummy View"
-      summary: "Example endpoint return a message"
-      description: ""
-      operationId: "post"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      responses:
-        "200":
-          description: "A detail view with a message"
-          schema:
-            $ref: '#/definitions/dummy_msg'
-      x-swagger-router-controller: "project.views.views"
+            $ref: '#/definitions/Country'
 definitions:
-  dummy_msg:
+  Country:
     type: "object"
     properties:
-      msg:
+      id:
         type: "string"
-externalDocs:
-  description: "Find out more about Swagger"
-  url: "http://swagger.io"
+      cases:
+        type: "array"
+        items:
+          $ref: "#/definitions/Case"
+      vaccinations:
+        type: "array"
+        items:
+          $ref: "#/definitions/Vaccination"
+  Case:
+    type: "integer"
+  Vaccination:
+    type: "integer"
+
