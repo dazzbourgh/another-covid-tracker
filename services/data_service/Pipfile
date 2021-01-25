@@ -10,6 +10,8 @@ Flask-Script = "==2.0.6"
 py-ms = {extras = ["all"],version = "==2.6.1"}
 marshmallow = "==3.8.0"
 marshmallow-sqlalchemy = "==0.23.1"
+ms-scaffold = {editable = true, path = "."}
+google-cloud-firestore = "==2.0.2"
 
 [dev-packages]
 requests-mock = "*"
@@ -22,4 +24,4 @@ tox = "*"
 bandit = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.8"

@@ -44,6 +44,8 @@ paths:
           description: "Active cases and vaccination details"
           schema:
             $ref: '#/definitions/Country'
+      x-swagger-router-controller: "project.views.country"
+      operationId: get
 definitions:
   Country:
     type: "object"

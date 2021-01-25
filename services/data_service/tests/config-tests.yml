@@ -3,23 +3,17 @@ pyms:
     requests:
       data: ""
     swagger:
-        path: "swagger"
+        path: "project/swagger"
         file: "swagger.yaml"
-        url: "/ui/"
+        url: "/swagger/"
         project_dir: "project.views"
     tracer:
         client: "jaeger"
         host: "localhost"
         component_name: "data-service"
     metrics: true
-    
-
   config:
     DEBUG: false
     TESTING: true
     APP_NAME: data-service
-    APPLICATION_ROOT : /data_service
-    SQLALCHEMY_TRACK_MODIFICATIONS: true
-    SECRET_KEY: "gjr39dkjn344_!67#"
-    DATABASE: db_test.sqlite3
-    SQLALCHEMY_DATABASE_URI: sqlite:///db_test.sqlite3
+    APPLICATION_ROOT : "/"
