@@ -1,6 +1,8 @@
 import json
 import os
 import unittest
+from unittest.mock import patch
+
 from project.app import MyMicroservice
 from pyms.constants import CONFIGMAP_FILE_ENVIRONMENT
 
@@ -23,7 +25,13 @@ class ProjectTestCase(unittest.TestCase):
         response = self.client.get('/healthcheck')
         self.assertEqual(200, response.status_code)
 
-    # def test_list_view(self):
-    #     response = self.client.get('/')
-    #     self.assertEqual(200, response.status_code)
+    @patch('project.views.country.get_countries')
+    def test_list_view(self, mock_get_countries):
+        mock_get_countries.return_value = [{
+            'iso_code': 'usa',
+            'vaccinations': '1',
+            'cases': '2'
+        }]
+        response = self.client.get('/countries/usa?from_date=2021-01-25&to_date=2021-01-26')
+        self.assertEqual(200, response.status_code)
 

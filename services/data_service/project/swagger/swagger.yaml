@@ -16,7 +16,7 @@ tags:
 schemes:
   - "http"
 paths:
-  /country:
+  /countries/{iso_code}:
     get:
       tags:
         - "Countries"
@@ -25,7 +25,7 @@ paths:
         - "application/json"
       parameters:
         - name: iso_code
-          in: query
+          in: path
           required: true
           type: string
           description: ISO code of the country

@@ -38,7 +38,15 @@ def import_csv(url, collection_name, start_date, cert_path):
 
     for country in filter(lambda c: c != '', countries):
         try:
-            store.collection(collection_name).document(country).set({'entries': countries[country]})
+            for entry in countries[country]:
+                date_string = entry['date']
+                copy = dict(entry)
+                copy['date'] = get_date(date_string)
+                store.collection(collection_name) \
+                    .document(country) \
+                    .collection('items') \
+                    .document(entry['date']) \
+                    .set(copy)
         except Exception as e:
             print(e)
 
