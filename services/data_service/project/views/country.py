@@ -12,9 +12,9 @@ def get(iso_code: str, from_date: str, to_date: str) -> Tuple[list, int]:
     def to_entry(document) -> dict:
         return {
             'iso_code': document['iso_code'],
-            'cases': document.get('total_cases', None),
-            'vaccinations': document.get('people_vaccinated', None),
+            'cases': float(document.get('total_cases', None)),
+            'vaccinations': float(document.get('people_vaccinated', None)),
             'date': document['date']
         }
 
-    return list(map(to_entry, documents)), 200
+    return [to_entry(doc) for doc in documents], 200

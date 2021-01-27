@@ -1,6 +1,7 @@
 import json
 import os
 import unittest
+from datetime import datetime
 from unittest.mock import patch
 
 from project.app import MyMicroservice
@@ -27,11 +28,19 @@ class ProjectTestCase(unittest.TestCase):
 
     @patch('project.views.country.get_countries')
     def test_list_view(self, mock_get_countries):
+        now = datetime.now()
         mock_get_countries.return_value = [{
             'iso_code': 'usa',
-            'vaccinations': '1',
-            'cases': '2'
+            'people_vaccinated': '1',
+            'total_cases': '2',
+            'date': now
         }]
         response = self.client.get('/countries/usa?from_date=2021-01-25&to_date=2021-01-26')
         self.assertEqual(200, response.status_code)
+        self.assertEqual([{
+            'cases': 2.0,
+            'date': now.strftime('%Y-%m-%dT%H:%M:%S.%fZ%Z'),
+            'iso_code': 'usa',
+            'vaccinations': 1.0
+        }], json.loads(response.data))
 
