@@ -12,8 +12,8 @@ def get(iso_code: str, from_date: str, to_date: str) -> Tuple[list, int]:
     def to_entry(document) -> dict:
         return {
             'iso_code': document['iso_code'],
-            'cases': float(document.get('total_cases', None)),
-            'vaccinations': float(document.get('people_vaccinated', None)),
+            'cases': float(document.get('new_cases', 0.0)),
+            'vaccinations': float(document.get('people_fully_vaccinated', 0.0)),
             'date': document['date']
         }
 

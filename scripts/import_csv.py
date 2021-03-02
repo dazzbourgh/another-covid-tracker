@@ -3,19 +3,16 @@ import sys
 import urllib.request
 from datetime import datetime
 
-from firebase_admin import firestore, credentials, initialize_app
+from google.cloud import firestore
+from google.oauth2.credentials import UserAccessTokenCredentials
 
 
 def get_date(date_str) -> datetime:
     return datetime.strptime(date_str, "%Y-%m-%d")
 
 
-def import_csv(url, collection_name, start_date, cert_path):
-    cred = credentials.Certificate(cert_path)
-    initialize_app(cred, {
-        'projectId': 'another-covid-tracker-de304',
-    })
-    store = firestore.client()
+def import_csv(url: str, collection_name: str, start_date: datetime):
+    db = firestore.Client(credentials=UserAccessTokenCredentials())
 
     lines = map(lambda bs: bs.decode('utf-8'), urllib.request.urlopen(url))
 
@@ -38,15 +35,17 @@ def import_csv(url, collection_name, start_date, cert_path):
 
     for country in filter(lambda c: c != '', countries):
         try:
+            batch = db.batch()
             for entry in countries[country]:
                 date_string = entry['date']
                 copy = dict(entry)
                 copy['date'] = get_date(date_string)
-                store.collection(collection_name) \
+                db.collection(collection_name) \
                     .document(country) \
                     .collection('items') \
                     .document(entry['date']) \
                     .set(copy)
+            batch.commit()
         except Exception as e:
             print(e)
 
@@ -55,5 +54,4 @@ if __name__ == "__main__":
     url = sys.argv[1]
     collection_name = sys.argv[2]
     start_date = get_date(sys.argv[3])
-    cert_path = sys.argv[4]
-    import_csv(url, collection_name, start_date, cert_path)
+    import_csv(url, collection_name, start_date)

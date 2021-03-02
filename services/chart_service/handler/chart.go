@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"another-covid-tracker.com/chart/types"
 	"another-covid-tracker.com/chart/util"
 	"fmt"
 	"github.com/NYTimes/gizmo/server"
@@ -19,33 +20,41 @@ func (c ChartHandler) BuildChart(w http.ResponseWriter, r *http.Request) {
 	isoCode := server.Vars(r)["isoCode"]
 	from := util.TimeString(r.URL.Query().Get("from")).Date()
 	to := util.TimeString(r.URL.Query().Get("to")).Date()
-	lineChart := charts.NewLine()
-	lineChart.SetGlobalOptions(
+	entries := c.Fetch(isoCode, from, to)
+	chartEntries := util.GetChartData(entries)
+	items := generateLineItems(chartEntries)
+
+	line3d := charts.NewLine3D()
+	line3d.SetGlobalOptions(
 		charts.WithInitializationOpts(opts.Initialization{Theme: chartTypes.ThemeInfographic}),
 		charts.WithTitleOpts(opts.Title{
 			Title: fmt.Sprintf("Vaccinations/Cases for %s", strings.ToUpper(isoCode)),
-		}))
-	entries := c.Fetch(isoCode, from, to)
-	cases := make([]float32, len(entries))
-	vaccinations := make([]float32, len(entries))
-	for i := range cases {
-		cases[i] = entries[i].Cases
-		vaccinations[i] = entries[i].Vaccinations
-	}
-	lineChart.
-		SetXAxis(vaccinations).
-		AddSeries("Cases", generateLineItems(cases)).
-		SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{}))
-	err := lineChart.Render(w)
+		}),
+		charts.WithXAxis3DOpts(opts.XAxis3D{Name: "Time", Type: "time", Min: chartEntries[0].Date.UnixNano() / 1000000}),
+		charts.WithYAxis3DOpts(opts.YAxis3D{Name: "Vaccinations", Min: chartEntries[0].Vaccinations}),
+		charts.WithZAxis3DOpts(opts.ZAxis3D{Name: "Cases"}),
+	)
+	line3d.AddSeries("line3D", items)
+	line3d.SetGlobalOptions()
+	err := line3d.Render(w)
 	if err != nil {
 		server.Log.Debug(err)
 	}
 }
 
-func generateLineItems(cases []float32) []opts.LineData {
-	items := make([]opts.LineData, len(cases))
-	for i := range cases {
-		items[i] = opts.LineData{Value: cases[i]}
+func generateLineItems(chartEntries types.Entries) []opts.Chart3DData {
+	data := make([][3]float64, len(chartEntries))
+	for i := 0; i < len(chartEntries); i++ {
+		data[i] = [3]float64{
+			float64(chartEntries[i].Date.UnixNano() / 1000000),
+			chartEntries[i].Vaccinations,
+			chartEntries[i].Cases,
+		}
 	}
-	return items
+
+	ret := make([]opts.Chart3DData, 0, len(data))
+	for _, d := range data {
+		ret = append(ret, opts.Chart3DData{Value: []interface{}{d[0], d[1], d[2]}})
+	}
+	return ret
 }

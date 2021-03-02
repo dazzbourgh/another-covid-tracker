@@ -4,8 +4,8 @@ import "time"
 
 type Entry struct {
 	IsoCode      string
-	Cases        float32
-	Vaccinations float32
+	Cases        float64
+	Vaccinations float64
 	Date         time.Time
 }
 
