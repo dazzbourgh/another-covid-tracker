@@ -8,4 +8,5 @@ require (
 	github.com/go-echarts/go-echarts/v2 v2.2.3
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/stretchr/testify v1.6.0 // indirect
+	google.golang.org/api v0.40.0 // indirect
 )
